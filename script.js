@@ -127,7 +127,44 @@ function drawBackground() {
   ctx.fillRect(0, 0, width, height);
 }
 
+// function drawMembrane() {
+//   ctx.strokeStyle = "rgba(255,255,255,0.14)";
+//   ctx.lineWidth = 1;
+
+//   for (let y = 0; y < rows; y++) {
+//     ctx.beginPath();
+
+//     for (let x = 0; x < cols; x++) {
+//       const px = x * cellW;
+//       const py = y * cellH - current[x][y] * 1.2;
+
+//       if (x === 0) ctx.moveTo(px, py);
+//       else ctx.lineTo(px, py);
+//     }
+
+//     ctx.stroke();
+//   }
+
+//   ctx.strokeStyle = "rgba(255,255,255,0.04)";
+//   for (let x = 0; x < cols; x++) {
+//     ctx.beginPath();
+
+//     for (let y = 0; y < rows; y++) {
+//       const px = x * cellW - current[x][y] * 0.35;
+//       const py = y * cellH;
+
+//       if (y === 0) ctx.moveTo(px, py);
+//       else ctx.lineTo(px, py);
+//     }
+
+//     ctx.stroke();
+//   }
+// }
 function drawMembrane() {
+  const cx = width * 0.5;
+  const cy = height * 0.5;
+
+  // horizontal lines
   ctx.strokeStyle = "rgba(255,255,255,0.14)";
   ctx.lineWidth = 1;
 
@@ -135,8 +172,22 @@ function drawMembrane() {
     ctx.beginPath();
 
     for (let x = 0; x < cols; x++) {
-      const px = x * cellW;
-      const py = y * cellH - current[x][y] * 1.2;
+      const baseX = x * cellW;
+      const baseY = y * cellH;
+      const h = current[x][y];
+
+      // direction away from center
+      const dx = baseX - cx;
+      const dy = baseY - cy;
+      const len = Math.sqrt(dx * dx + dy * dy) || 1;
+
+      // push points outward from the center a bit
+      const offsetX = (dx / len) * h * 0.35;
+      const offsetY = (dy / len) * h * 0.35;
+
+      // slight upward bias still helps the "bulge" read nicely
+      const px = baseX + offsetX;
+      const py = baseY + offsetY - h * 0.35;
 
       if (x === 0) ctx.moveTo(px, py);
       else ctx.lineTo(px, py);
@@ -145,13 +196,26 @@ function drawMembrane() {
     ctx.stroke();
   }
 
+  // vertical lines
   ctx.strokeStyle = "rgba(255,255,255,0.04)";
+
   for (let x = 0; x < cols; x++) {
     ctx.beginPath();
 
     for (let y = 0; y < rows; y++) {
-      const px = x * cellW - current[x][y] * 0.35;
-      const py = y * cellH;
+      const baseX = x * cellW;
+      const baseY = y * cellH;
+      const h = current[x][y];
+
+      const dx = baseX - cx;
+      const dy = baseY - cy;
+      const len = Math.sqrt(dx * dx + dy * dy) || 1;
+
+      const offsetX = (dx / len) * h * 0.35;
+      const offsetY = (dy / len) * h * 0.35;
+
+      const px = baseX + offsetX;
+      const py = baseY + offsetY - h * 0.35;
 
       if (y === 0) ctx.moveTo(px, py);
       else ctx.lineTo(px, py);
